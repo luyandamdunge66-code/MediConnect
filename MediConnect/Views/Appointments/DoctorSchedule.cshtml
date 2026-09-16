@@ -7,8 +7,8 @@
 }
 
 <div class="container py-3">
-
-    <!-- Doctor Profile & Stats Header Card -->
+    
+    <!-- Doctor Profile Header -->
     <div class="card border-0 shadow-sm rounded-3 mb-4 p-4 bg-white">
         <div class="row align-items-center">
             <div class="col-md-auto text-center mb-3 mb-md-0">
@@ -38,7 +38,6 @@
                     <span>Practice Reg: <code>@(doctor?.LicenseNumber ?? "N/A")</code></span>
                 </p>
 
-                <!-- Photo Upload Form -->
                 <form asp-controller="Appointments" asp-action="UploadPhoto" method="post" enctype="multipart/form-data" class="row g-2 align-items-center">
                     @Html.AntiForgeryToken()
                     <div class="col-auto">
@@ -63,22 +62,20 @@
             <h4 class="fw-bold text-dark mb-1">
                 <i class="bi bi-clipboard2-pulse text-success me-2"></i>My Consultation Queue
             </h4>
-            <p class="text-muted small mb-0">Manage incoming patient bookings and consult statuses.</p>
+            <p class="text-muted small mb-0">Review patient medical alerts and record consultation notes.</p>
         </div>
     </div>
 
-    <!-- Queue Table -->
     <div class="card border-0 shadow-sm rounded-3 mb-5">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">Patient Name</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Reported Symptoms / Reason</th>
-                            <th>Current Status</th>
+                            <th class="ps-4">Patient & Health Alerts</th>
+                            <th>Date & Time</th>
+                            <th>Reported Symptoms</th>
+                            <th>Status</th>
                             <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
@@ -86,7 +83,7 @@
                         @if (!Model.Any())
                         {
                             <tr>
-                                <td colspan="6" class="text-center py-5 text-muted">
+                                <td colspan="5" class="text-center py-5 text-muted">
                                     <i class="bi bi-calendar2-minus fs-1 d-block mb-2 text-secondary"></i>
                                     No patient bookings in your schedule yet.
                                 </td>
@@ -97,12 +94,34 @@
                             @foreach (var item in Model)
                             {
                                 <tr>
-                                    <td class="ps-4 fw-semibold text-dark">
-                                        <i class="bi bi-person text-primary me-1"></i>
-                                        @(item.Patient?.User?.FullName ?? "Patient")
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-dark">
+                                            <i class="bi bi-person text-primary me-1"></i>@(item.Patient?.User?.FullName ?? "Patient")
+                                        </div>
+                                        <!-- Real EMR Blood Group & Allergy Badges -->
+                                        <div class="mt-1 d-flex flex-wrap gap-1">
+                                            @if (!string.IsNullOrEmpty(item.Patient?.BloodGroup))
+                                            {
+                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle small">
+                                                    <i class="bi bi-droplet-fill me-1"></i>Blood: @item.Patient.BloodGroup
+                                                </span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.Patient?.Allergies))
+                                            {
+                                                <span class="badge bg-warning bg-opacity-25 text-dark border border-warning small">
+                                                    <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>Allergy: @item.Patient.Allergies
+                                                </span>
+                                            }
+                                            @if (string.IsNullOrEmpty(item.Patient?.BloodGroup) && string.IsNullOrEmpty(item.Patient?.Allergies))
+                                            {
+                                                <small class="text-muted fst-italic">No health profile logged</small>
+                                            }
+                                        </div>
                                     </td>
-                                    <td>@item.AppointmentDate.ToString("dd MMM yyyy")</td>
-                                    <td><code class="text-dark">@DateTime.Today.Add(item.AppointmentTime).ToString("hh:mm tt")</code></td>
+                                    <td>
+                                        <div>@item.AppointmentDate.ToString("dd MMM yyyy")</div>
+                                        <small class="text-muted">@DateTime.Today.Add(item.AppointmentTime).ToString("hh:mm tt")</small>
+                                    </td>
                                     <td class="text-muted small">@item.Reason</td>
                                     <td>
                                         @if (item.Status == "Pending")
@@ -147,7 +166,7 @@
                                         }
                                         else if (item.Status == "Confirmed")
                                         {
-                                            <!-- Complete Consultation Button Triggering Notes Modal -->
+                                            <!-- Complete Consultation Button Triggering Modal -->
                                             <button type="button" class="btn btn-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#completeModal_@item.AppointmentId">
                                                 <i class="bi bi-check2-all me-1"></i>Complete Visit
                                             </button>
@@ -174,18 +193,18 @@
 
                                                                 <div class="mb-3">
                                                                     <label class="form-label small fw-semibold">Medical Diagnosis:</label>
-                                                                    <input type="text" name="diagnosis" class="form-control" placeholder="e.g. Acute Migraine / Seasonal Flu" required />
+                                                                    <input type="text" name="diagnosis" class="form-control" placeholder="e.g. Acute Migraine / Hypertension" required />
                                                                 </div>
 
                                                                 <div class="mb-3">
-                                                                    <label class="form-label small fw-semibold">Prescription & Doctor Instructions:</label>
-                                                                    <textarea name="doctorNotes" class="form-control" rows="3" placeholder="Medication dosage, rest period, or follow-up instructions..." required></textarea>
+                                                                    <label class="form-label small fw-semibold">Prescription & Advice:</label>
+                                                                    <textarea name="doctorNotes" class="form-control" rows="3" placeholder="Medications, dosage, rest period, or follow-up instructions..." required></textarea>
                                                                 </div>
                                                             </div>
                                                             <div class="modal-footer bg-light">
                                                                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
                                                                 <button type="submit" class="btn btn-success btn-sm fw-semibold">
-                                                                    Record & Complete
+                                                                    Save & Complete
                                                                 </button>
                                                             </div>
                                                         </form>
@@ -193,9 +212,79 @@
                                                 </div>
                                             </div>
                                         }
-                                        else
+                                        else if (item.Status == "Completed")
                                         {
-                                            <span class="text-muted small">Finished</span>
+                                            <!-- Doctor Print / View Note Button -->
+                                            <button type="button" class="btn btn-outline-primary btn-sm px-2" data-bs-toggle="modal" data-bs-target="#printModal_@item.AppointmentId">
+                                                <i class="bi bi-printer me-1"></i>Print Slip
+                                            </button>
+
+                                            <!-- Official Medical Prescription Slip Modal -->
+                                            <div class="modal fade text-start" id="printModal_@item.AppointmentId" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                    <div class="modal-content border-0 shadow">
+                                                        <div class="modal-body p-4 p-md-5" id="slip_@item.AppointmentId">
+                                                            <!-- Clinic Letterhead -->
+                                                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                                                                <div>
+                                                                    <h3 class="fw-bold text-primary mb-0">🏥 MediConnect Clinic</h3>
+                                                                    <small class="text-muted">Official Medical Consultation Slip</small>
+                                                                </div>
+                                                                <div class="text-end">
+                                                                    <small class="text-muted d-block">Date: @item.AppointmentDate.ToString("dd MMMM yyyy")</small>
+                                                                    <span class="badge bg-success">Consultation Completed</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Doctor & Patient Details -->
+                                                            <div class="row g-3 mb-4">
+                                                                <div class="col-6">
+                                                                    <h6 class="fw-bold text-secondary small text-uppercase mb-1">Attending Specialist:</h6>
+                                                                    <p class="mb-0 fw-bold">Dr. @(doctor?.User?.FullName ?? User.Identity?.Name)</p>
+                                                                    <small class="text-muted">@(doctor?.Specialization) • Reg: @(doctor?.LicenseNumber)</small>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <h6 class="fw-bold text-secondary small text-uppercase mb-1">Patient Details:</h6>
+                                                                    <p class="mb-0 fw-bold">@(item.Patient?.User?.FullName)</p>
+                                                                    <small class="text-muted">
+                                                                        Blood: @(item.Patient?.BloodGroup ?? "N/A") | 
+                                                                        Allergies: @(item.Patient?.Allergies ?? "None recorded")
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Clinical Diagnosis -->
+                                                            <div class="mb-4 p-3 bg-light rounded-3 border">
+                                                                <h6 class="fw-bold text-primary small text-uppercase mb-1">Clinical Diagnosis:</h6>
+                                                                <p class="mb-0 fs-5 fw-semibold text-dark">@(item.Diagnosis ?? "General Medical Examination")</p>
+                                                            </div>
+
+                                                            <!-- Prescription & Treatment Notes -->
+                                                            <div class="mb-4">
+                                                                <h6 class="fw-bold text-secondary small text-uppercase mb-1">Rx / Prescription & Medical Advice:</h6>
+                                                                <div class="p-3 border rounded-3 bg-white" style="min-height: 100px; white-space: pre-line;">
+                                                                    @(item.DoctorNotes ?? "No additional medications prescribed.")
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Signature Line -->
+                                                            <div class="pt-4 border-top d-flex justify-content-between align-items-end mt-4">
+                                                                <small class="text-muted">Computer-generated medical slip &bull; MediConnect EMR</small>
+                                                                <div class="text-center" style="width: 200px;">
+                                                                    <div class="border-bottom pb-2 fw-semibold">Dr. @(doctor?.User?.FullName ?? User.Identity?.Name)</div>
+                                                                    <small class="text-muted">Authorized Signature</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer bg-light">
+                                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-primary btn-sm px-3" onclick="window.print()">
+                                                                <i class="bi bi-printer me-1"></i> Print Slip
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         }
                                     </td>
                                 </tr>
@@ -207,7 +296,7 @@
         </div>
     </div>
 
-    <!-- Patient Reviews & Written Feedback Section -->
+    <!-- Patient Reviews Section -->
     <div class="card border-0 shadow-sm rounded-3">
         <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
             <h5 class="fw-bold text-dark mb-0">
@@ -252,12 +341,6 @@
                                 <p class="text-secondary mb-0 small fst-italic ps-2 border-start border-warning border-3 mt-2">
                                     "@review.Comment"
                                 </p>
-                            }
-                            else
-                            {
-                                <small class="text-muted fst-italic ps-2 border-start border-3 mt-1 d-block">
-                                    (Patient gave a star rating without written comments)
-                                </small>
                             }
                         </div>
                     }

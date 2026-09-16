@@ -1,6 +1,6 @@
 ﻿@model MediConnect.Models.PatientProfileViewModel
 @{
-    ViewData["Title"] = "Patient Health Profile";
+    ViewData["Title"] = "My Health Profile";
 }
 
 <div class="row justify-content-center my-4">
@@ -8,75 +8,68 @@
         <div class="card border-0 shadow-sm rounded-3">
             <div class="card-body p-4 p-md-5">
 
-                <!-- Header -->
                 <div class="text-center mb-4">
                     <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle p-3 mb-2">
-                        <i class="bi bi-heart-pulse fs-2"></i>
+                        <i class="bi bi-heart-pulse-fill fs-2"></i>
                     </div>
-                    <h3 class="fw-bold text-dark">Medical Health Profile</h3>
-                    <p class="text-muted small">Your medical details will be visible to doctors during your consultations.</p>
+                    <h3 class="fw-bold text-dark">Patient Health Profile</h3>
+                    <p class="text-muted small">Update your clinical information so doctors can treat you safely.</p>
                 </div>
 
                 <form asp-controller="Appointments" asp-action="Profile" method="post">
                     @Html.AntiForgeryToken()
 
-                    <!-- Read-Only Identity Card -->
-                    <div class="bg-light p-3 rounded-3 mb-3 border">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="fw-bold mb-0 text-dark">@Model.FullName</h6>
-                                <small class="text-muted">@Model.Email</small>
-                            </div>
-                            <span class="badge bg-primary">Verified Patient</span>
+                    <!-- Name & Email (Readonly) -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold text-secondary">Full Name</label>
+                            <input type="text" class="form-control form-control-sm bg-light" value="@Model.FullName" readonly />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold text-secondary">Email</label>
+                            <input type="text" class="form-control form-control-sm bg-light" value="@Model.Email" readonly />
                         </div>
                     </div>
 
-                    <!-- Phone Number -->
-                    <div class="mb-3">
-                        <label asp-for="Phone" class="form-label small fw-semibold"></label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="bi bi-telephone"></i></span>
-                            <input asp-for="Phone" class="form-control" placeholder="e.g. +27 82 123 4567" />
-                        </div>
-                    </div>
-
-                    <!-- Blood Group Dropdown -->
+                    <!-- Blood Group -->
                     <div class="mb-3">
                         <label asp-for="BloodGroup" class="form-label small fw-semibold text-danger">
                             <i class="bi bi-droplet-fill me-1"></i>Blood Group
                         </label>
                         <select asp-for="BloodGroup" class="form-select">
                             <option value="">-- Select Blood Group --</option>
-                            <option value="A+">A Positive (A+)</option>
-                            <option value="A-">A Negative (A-)</option>
-                            <option value="B+">B Positive (B+)</option>
-                            <option value="B-">B Negative (B-)</option>
-                            <option value="AB+">AB Positive (AB+)</option>
-                            <option value="AB-">AB Negative (AB-)</option>
-                            <option value="O+">O Positive (O+)</option>
-                            <option value="O-">O Negative (O-)</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
                         </select>
                     </div>
 
-                    <!-- Allergies Alert Field -->
+                    <!-- Allergies Alert -->
                     <div class="mb-3">
-                        <label asp-for="Allergies" class="form-label small fw-semibold text-warning text-dark">
-                            <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>Known Allergies
+                        <label asp-for="Allergies" class="form-label small fw-semibold text-warning">
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>Known Allergies (Crucial for Doctors)
                         </label>
-                        <textarea asp-for="Allergies" class="form-control" rows="2" placeholder="e.g. Penicillin, Peanuts, Latex, Sulfa drugs (Leave blank if none)"></textarea>
-                        <div class="form-text small text-muted">Doctors will be warned of these before prescribing treatments.</div>
+                        <input asp-for="Allergies" class="form-control" placeholder="e.g. Penicillin, Peanuts, Latex, Aspirin (or None)" />
+                        <small class="text-muted">Doctors will see this alert before prescribing medicine.</small>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="mb-3">
+                        <label asp-for="Phone" class="form-label small fw-semibold">Contact Phone Number</label>
+                        <input asp-for="Phone" class="form-control" placeholder="e.g. 071 234 5678" />
                     </div>
 
                     <!-- Emergency Contact -->
                     <div class="mb-4">
-                        <label asp-for="EmergencyContact" class="form-label small fw-semibold">Emergency Contact</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="bi bi-person-lines-fill"></i></span>
-                            <input asp-for="EmergencyContact" class="form-control" placeholder="e.g. Nomsa Mdunge (Sister) - 071 987 6543" />
-                        </div>
+                        <label asp-for="EmergencyContact" class="form-label small fw-semibold">Emergency Contact Person & Phone</label>
+                        <input asp-for="EmergencyContact" class="form-control" placeholder="e.g. Nomsa (Sister) - 082 345 6789" />
                     </div>
 
-                    <!-- Save Button -->
                     <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
                         <i class="bi bi-check2-circle me-1"></i> Save Health Profile
                     </button>

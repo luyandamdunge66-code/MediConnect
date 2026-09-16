@@ -34,7 +34,6 @@
                             </a>
                         </li>
 
-                        <!-- Patient Navigation Links -->
                         @if (User.IsInRole("Patient"))
                         {
                             <li class="nav-item">
@@ -48,13 +47,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-info fw-semibold" asp-controller="Appointments" asp-action="Profile">
+                                <a class="nav-link text-danger fw-semibold" asp-controller="Appointments" asp-action="Profile">
                                     <i class="bi bi-heart-pulse me-1"></i> Health Profile
                                 </a>
                             </li>
                         }
 
-                        <!-- Doctor Navigation Links -->
                         @if (User.IsInRole("Doctor"))
                         {
                             <li class="nav-item">
@@ -64,7 +62,6 @@
                             </li>
                         }
 
-                        <!-- Admin Navigation Links -->
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
@@ -80,7 +77,6 @@
                         }
                     </ul>
 
-                    <!-- Dynamic Auth Buttons -->
                     <div class="d-flex align-items-center gap-2">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
