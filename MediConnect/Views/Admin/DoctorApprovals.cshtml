@@ -1,0 +1,120 @@
+﻿@model IEnumerable<MediConnect.Models.Doctor>
+@{
+    ViewData["Title"] = "Doctor Applications & Approvals";
+}
+
+<div class="container py-3">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-shield-check text-primary me-2"></i>Doctor Verification & Management
+            </h2>
+            <p class="text-muted small mb-0">Review pending credentials, manage active doctors, or remove staff accounts.</p>
+        </div>
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary btn-sm px-3 fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Doctor Table -->
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Doctor Name</th>
+                            <th>Email Address</th>
+                            <th>Specialization</th>
+                            <th>License Number</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                    No doctors currently registered in the clinic.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var doctor in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-semibold text-dark">
+                                        <i class="bi bi-person-badge text-primary me-2"></i>
+                                        @(doctor.User?.FullName ?? "Unknown Doctor")
+                                    </td>
+                                    <td class="text-muted">@(doctor.User?.Email ?? "N/A")</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            @doctor.Specialization
+                                        </span>
+                                    </td>
+                                    <td><code class="text-dark">@doctor.LicenseNumber</code></td>
+                                    <td>
+                                        @if (doctor.ApprovalStatus == "Pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-clock me-1"></i>Pending Review
+                                            </span>
+                                        }
+                                        else if (doctor.ApprovalStatus == "Approved")
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle me-1"></i>Approved
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle me-1"></i>Rejected
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-inline-flex gap-2">
+                                            @if (doctor.ApprovalStatus == "Pending")
+                                            {
+                                                <!-- Approve Form -->
+                                                <form asp-controller="Admin" asp-action="ApproveDoctor" asp-route-id="@doctor.DoctorId" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-success btn-sm px-2">
+                                                        <i class="bi bi-check-lg me-1"></i>Approve
+                                                    </button>
+                                                </form>
+
+                                                <!-- Reject Form -->
+                                                <form asp-controller="Admin" asp-action="RejectDoctor" asp-route-id="@doctor.DoctorId" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-outline-warning text-dark btn-sm px-2">
+                                                        <i class="bi bi-x-lg me-1"></i>Reject
+                                                    </button>
+                                                </form>
+                                            }
+
+                                            <!-- Delete Doctor Form (Available for any doctor) -->
+                                            <form asp-controller="Admin" asp-action="DeleteDoctor" asp-route-id="@doctor.DoctorId" method="post"
+                                                  onsubmit="return confirm('Are you sure you want to permanently delete this doctor and their account?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-outline-danger btn-sm px-2" title="Permanently Delete Doctor">
+                                                    <i class="bi bi-trash3 me-1"></i>Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

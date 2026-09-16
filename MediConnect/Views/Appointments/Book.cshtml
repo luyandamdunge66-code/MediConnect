@@ -1,0 +1,73 @@
+﻿@model MediConnect.Models.BookAppointmentViewModel
+@{
+    ViewData["Title"] = "Book a Consultation";
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-7 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-4 p-md-5">
+
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle p-3 mb-2">
+                        <i class="bi bi-calendar-plus-fill fs-2"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Book an Appointment</h3>
+                    <p class="text-muted small">Select your certified doctor, date, and preferred time slot.</p>
+                </div>
+
+                <form asp-controller="Appointments" asp-action="Book" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3"></div>
+
+                    <!-- Doctor Selection Dropdown -->
+                    <div class="mb-3">
+                        <label asp-for="DoctorId" class="form-label small fw-semibold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-person-badge"></i></span>
+                            <select asp-for="DoctorId" asp-items="Model.AvailableDoctors" class="form-select" required>
+                                <option value="">-- Choose an Approved Doctor --</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="DoctorId" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Date & Time Picker -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="AppointmentDate" class="form-label small fw-semibold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-calendar-event"></i></span>
+                                <input asp-for="AppointmentDate" type="date" class="form-control" required />
+                            </div>
+                            <span asp-validation-for="AppointmentDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="AppointmentTime" class="form-label small fw-semibold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-clock"></i></span>
+                                <input asp-for="AppointmentTime" type="time" class="form-control" required />
+                            </div>
+                            <span asp-validation-for="AppointmentTime" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Reason / Symptoms -->
+                    <div class="mb-4">
+                        <label asp-for="Reason" class="form-label small fw-semibold"></label>
+                        <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Briefly describe your symptoms or reason for visit..."></textarea>
+                        <span asp-validation-for="Reason" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                        <i class="bi bi-check2-circle me-1"></i> Confirm Appointment
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

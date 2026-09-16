@@ -1,0 +1,155 @@
+﻿@model MediConnect.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Command Center";
+}
+
+<div class="container py-3">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-speedometer2 text-primary me-2"></i>Clinic Overview & Analytics
+            </h2>
+            <p class="text-muted small mb-0">Live operational metrics and clinic appointment activity.</p>
+        </div>
+        <a asp-controller="Admin" asp-action="DoctorApprovals" class="btn btn-outline-warning text-dark btn-sm px-3 fw-semibold">
+            <i class="bi bi-shield-check me-1"></i> Review Doctor Approvals (@Model.PendingApprovals)
+        </a>
+    </div>
+
+    <!-- 4 Live Metric Stat Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Card 1: Patients -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-primary border-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted small fw-semibold text-uppercase">Patients</span>
+                        <h3 class="fw-bold text-dark mt-1 mb-0">@Model.TotalPatients</h3>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+                        <i class="bi bi-people fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Doctors -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-success border-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted small fw-semibold text-uppercase">Active Doctors</span>
+                        <h3 class="fw-bold text-dark mt-1 mb-0">@Model.TotalDoctors</h3>
+                    </div>
+                    <div class="bg-success bg-opacity-10 text-success p-3 rounded-circle">
+                        <i class="bi bi-clipboard2-pulse fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Pending Approvals -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-warning border-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted small fw-semibold text-uppercase">Pending Doctors</span>
+                        <h3 class="fw-bold text-dark mt-1 mb-0">@Model.PendingApprovals</h3>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-circle">
+                        <i class="bi bi-clock-history fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Total Appointments -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-info border-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted small fw-semibold text-uppercase">Appointments</span>
+                        <h3 class="fw-bold text-dark mt-1 mb-0">@Model.TotalAppointments</h3>
+                    </div>
+                    <div class="bg-info bg-opacity-10 text-info p-3 rounded-circle">
+                        <i class="bi bi-calendar2-check fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Clinic Appointments Table -->
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header bg-white py-3 border-0">
+            <h5 class="fw-bold text-dark mb-0">
+                <i class="bi bi-clock me-2 text-primary"></i>Recent Clinic Appointments
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Patient</th>
+                            <th>Doctor Assigned</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Reason</th>
+                            <th class="text-end pe-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.RecentAppointments.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                    No appointment activity yet.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var appt in Model.RecentAppointments)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-semibold text-dark">
+                                        <i class="bi bi-person text-primary me-1"></i>
+                                        @(appt.Patient?.User?.FullName ?? "Patient")
+                                    </td>
+                                    <td>
+                                        Dr. @(appt.Doctor?.User?.FullName ?? "Doctor")
+                                        <span class="badge bg-light text-muted border ms-1">@(appt.Doctor?.Specialization ?? "General")</span>
+                                    </td>
+                                    <td>@appt.AppointmentDate.ToString("dd MMM yyyy")</td>
+                                    <td><code class="text-dark">@DateTime.Today.Add(appt.AppointmentTime).ToString("hh:mm tt")</code></td>
+                                    <td class="text-muted small">@appt.Reason</td>
+                                    <td class="text-end pe-4">
+                                        @if (appt.Status == "Pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        }
+                                        else if (appt.Status == "Confirmed")
+                                        {
+                                            <span class="badge bg-success">Confirmed</span>
+                                        }
+                                        else if (appt.Status == "Completed")
+                                        {
+                                            <span class="badge bg-primary">Completed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
